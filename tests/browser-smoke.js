@@ -17,7 +17,7 @@ function assert(cond, msg) { if (!cond) throw new Error('ASSERT: ' + msg); }
   const app = createApp({ dbFile: ':memory:', staffPin: '2468', taxRate: 0.078, demoPayments: '1' });
   const server = await new Promise(r => { const s = app.listen(0, () => r(s)); });
   const base = `http://127.0.0.1:${server.address().port}`;
-  const browser = await chromium.launch();
+  const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const errors = [];
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
   const page = await ctx.newPage();
