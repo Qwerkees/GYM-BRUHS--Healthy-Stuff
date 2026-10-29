@@ -18,7 +18,14 @@
   function applyStrings() {
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
     $('#langBtn').textContent = I18N.lang === 'en' ? 'ES' : 'EN';
+    const hero = $('#heroTitle'); if (hero) hero.innerHTML = t('heroTitle'); // string ships with the app, not user input
     document.title = `GYM BRUHS — ${t('tagline')}`;
+  }
+
+  function renderShareQr() {
+    const img = $('#shareQr'); const sel = $('#loc');
+    if (!img || !sel || !sel.value) return;
+    img.src = `/api/locations/${encodeURIComponent(sel.value)}/qr.svg`;
   }
 
   function itemPrice(item, opts) {
@@ -234,7 +241,21 @@
     for (const l of config.locations) { const o = document.createElement('option'); o.value = l.slug; o.textContent = l.name; sel.appendChild(o); }
     const remembered = presetLoc || localStorage.getItem('gb_loc');
     if (remembered && config.locations.some(l => l.slug === remembered)) sel.value = remembered;
-    sel.onchange = () => localStorage.setItem('gb_loc', sel.value);
+    sel.onchange = () => { localStorage.setItem('gb_loc', sel.value); renderShareQr(); };
+    renderShareQr();
+
+    $('#trackForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const code = $('#trackCode').value.trim().toUpperCase();
+      if (code) location.href = `/order/${encodeURIComponent(code)}`;
+    });
+    $('#copyLink').onclick = async () => {
+      const url = `${location.origin}/?loc=${encodeURIComponent(sel.value)}`;
+      const btn = $('#copyLink');
+      try { await navigator.clipboard.writeText(url); btn.textContent = t('copied'); }
+      catch { prompt('Copy this link:', url); }
+      setTimeout(() => { btn.textContent = t('copyLink'); }, 1500);
+    };
     if (presetLoc && config.locations.some(l => l.slug === presetLoc)) localStorage.setItem('gb_loc', presetLoc);
 
     $('#langBtn').onclick = () => { I18N.set(I18N.lang === 'en' ? 'es' : 'en'); renderAll(); };

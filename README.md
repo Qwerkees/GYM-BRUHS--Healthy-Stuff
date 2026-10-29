@@ -28,6 +28,12 @@ Features:
 - Installable as a home-screen app (PWA manifest + icons).
 - SQLite storage locally (one file, no services needed); Postgres (Neon) when hosted.
 
+## Design
+
+Dark + lime, big display headlines, stacked card sections (hero → menu → order tracking → share QR →
+install → staff). The standalone prototype it's based on lives in `design/reference.html`.
+English is the default language; the ES toggle is remembered per device.
+
 ## Run it
 
 ```sh

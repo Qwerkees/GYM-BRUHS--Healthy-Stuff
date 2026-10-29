@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0f1a">
+<meta name="theme-color" content="#0e0f0c">
 <title>GYM BRUHS — Healthy Stuff</title>
 <link rel="stylesheet" href="/styles.css">
 <link rel="manifest" href="/manifest.webmanifest">
@@ -15,23 +15,72 @@
   <a class="brand" href="/"><span class="logo">💪</span><span><b>GYM BRUHS</b><small data-i18n="tagline">Healthy Stuff</small></span></a>
   <div class="actions">
     <button class="pill" id="langBtn" type="button" aria-label="Language">ES</button>
-    <a class="pill" href="/staff" id="staffLink" style="text-decoration:none">Staff</a>
+    <a class="pill" href="/staff" id="staffLink" style="text-decoration:none" data-i18n="staff">Staff</a>
   </div>
 </header>
 
 <main class="wrap">
+  <div class="loc-tag" data-i18n="locTag">Chandler · East Valley & nearby</div>
+
   <section class="hero">
-    <h1 data-i18n="heroTitle">Fuel up, bruh. 💪</h1>
+    <span class="kicker" data-i18n="kicker">Fuel up, bruh. 💪</span>
+    <h1 class="display" id="heroTitle"></h1>
     <p data-i18n="heroText"></p>
     <div class="loc">
       <label for="loc" class="hint" data-i18n="pickup">Pickup spot</label>
       <select id="loc" aria-label="Pickup spot"></select>
     </div>
+    <a class="btn cta" href="#menu" data-i18n="heroBtn">Build my order ↗</a>
   </section>
 
+  <div class="strip">
+    <span data-i18n="strip1">Healthy snacks only</span>
+    <span data-i18n="strip2">Real macros</span>
+    <span data-i18n="strip3">Pay on your phone</span>
+    <span class="hot" data-i18n="strip4">Your way, no excuses.</span>
+  </div>
+
+  <div class="menu-head" id="menu-top">
+    <h2 class="display" data-i18n="menuH">Build your order.</h2>
+    <p data-i18n="menuLead"></p>
+  </div>
   <nav class="cats" id="cats" aria-label="Categories"></nav>
   <section class="grid" id="menu" aria-live="polite"></section>
-  <footer><span data-i18n="poweredBy">Powered by</span> Maverick3 L.L.C.</footer>
+
+  <section class="section" id="track">
+    <h2 class="display" data-i18n="trackH">Order tracking</h2>
+    <p class="lead" data-i18n="trackLead"></p>
+    <form class="trackrow" id="trackForm">
+      <input type="text" id="trackCode" placeholder="AB12CD" maxlength="6" autocomplete="off" aria-label="Order code">
+      <button class="btn ghost" type="submit" data-i18n="trackBtn">View status</button>
+    </form>
+  </section>
+
+  <section class="section" id="share">
+    <h2 class="display" data-i18n="qrH">Share the gains.</h2>
+    <p class="lead" data-i18n="qrLead"></p>
+    <div class="qrbox">
+      <div class="qrimg"><img id="shareQr" alt="QR code for this app" src=""></div>
+      <div class="actions-grid">
+        <button class="btn ghost sm" type="button" id="copyLink" data-i18n="copyLink">Copy app link</button>
+        <a class="btn ghost sm" href="/print" data-i18n="posters">Printable posters</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="install">
+    <h2 class="display" data-i18n="instH">Install on my phone</h2>
+    <div class="steps-install">
+      <div><b>Android</b> · <span data-i18n="instA"></span></div>
+      <div><b>iPhone</b> · <span data-i18n="instI"></span></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>GYM BRUHS · <span data-i18n="tagline">Healthy Stuff</span></div>
+    <div><a href="#share" data-i18n="footShare">Share this app ↗</a> · <a href="/staff" data-i18n="footStaff">Staff panel</a></div>
+    <div><span data-i18n="poweredBy">Powered by</span> Maverick3 L.L.C.</div>
+  </footer>
 </main>
 
 <div class="cartbar" id="cartbar" hidden>
@@ -43,7 +92,7 @@
 
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
   <div class="panel">
-    <h2><span id="sheetTitle" data-i18n="cart">Your cart</span><button type="button" id="closeCart" aria-label="Close">×</button></h2>
+    <h2 class="display"><span id="sheetTitle" data-i18n="cart">Your order</span><button type="button" id="closeCart" aria-label="Close">×</button></h2>
     <div id="lines"></div>
     <div class="totals">
       <div><span data-i18n="subtotal">Subtotal</span><span id="subtotal"></span></div>
@@ -58,6 +107,7 @@
         <label id="payCard"><input type="radio" name="payment" value="card"><b data-i18n="card">Pay now</b><small data-i18n="cardSub"></small></label>
         <label id="payCounter" class="sel"><input type="radio" name="payment" value="counter" checked><b data-i18n="counter">Pay at counter</b><small data-i18n="counterSub"></small></label>
       </div>
+      <p class="note" data-i18n="orderNote"></p>
       <div class="err" id="err" role="alert"></div>
       <button class="btn block" id="placeBtn" type="submit" data-i18n="placeOrder">Place order</button>
     </form>

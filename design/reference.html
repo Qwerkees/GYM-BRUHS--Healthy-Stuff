@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e0f0c">
+<title>GYM BRUHS · Healthy Stuff</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#0e0f0c; --card:#171913; --card2:#1f221a; --line:#2b2f24;
+    --text:#f2f3ee; --muted:#a7ab9c; --lime:#c6ff3d; --lime-ink:#0e0f0c;
+    --green:#1fb87a; --red:#ff6b6b; --amber:#ffc857; --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:var(--lime)}
+  .wrap{max-width:600px;margin:0 auto;padding:0 16px 48px}
+  .display{font-family:"Bebas Neue",Impact,sans-serif;letter-spacing:.02em;line-height:.95}
+  header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 8px;gap:12px}
+  .brand .display{font-size:34px}
+  .brand small{display:block;color:var(--lime);font-weight:700;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+  .lang{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .lang button{background:transparent;border:0;color:var(--muted);font:600 12px Inter;padding:7px 12px;border-radius:999px;cursor:pointer}
+  .lang button.on{background:var(--lime);color:var(--lime-ink)}
+  .loc{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:4px 0 18px}
+  .hero{background:linear-gradient(160deg,#1c2114,#121410);border:1px solid var(--line);border-radius:26px;padding:28px 22px;position:relative;overflow:hidden}
+  .hero:before{content:"";position:absolute;inset:auto -60px -80px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(198,255,61,.35),transparent 65%)}
+  .hero h1{font-size:60px;margin:0 0 10px}
+  .hero h1 em{font-style:normal;color:var(--lime)}
+  .hero p{color:var(--muted);margin:0 0 18px;line-height:1.5}
+  .badge{display:inline-block;background:var(--lime);color:var(--lime-ink);font:700 11px Inter;letter-spacing:.14em;padding:7px 12px;border-radius:999px;margin-bottom:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;font:700 15px Inter;padding:14px 20px;border-radius:14px;text-decoration:none;transition:transform .08s}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--lime);color:var(--lime-ink)}
+  .btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+  .btn-sm{padding:10px 14px;font-size:13px;border-radius:11px}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .strip{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 28px}
+  .strip span{font:600 11px Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:8px 12px;border-radius:999px}
+  .strip span.hot{color:var(--lime);border-color:rgba(198,255,61,.4)}
+  section{margin:0 0 28px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  h2{font-size:40px;margin:0 0 8px}
+  .lead{color:var(--muted);margin:0 0 16px;line-height:1.5;font-size:14px}
+  .note{font-size:12px;color:var(--muted);background:var(--card2);border-left:3px solid var(--lime);padding:10px 12px;border-radius:0 10px 10px 0;margin:0 0 16px;line-height:1.45}
+  label{display:block;font:600 12px Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+  input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 13px;font:500 15px Inter;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--lime)}
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--lime) 50%),linear-gradient(135deg,var(--lime) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+  textarea{min-height:80px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hidden{display:none!important}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .chip{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font:500 13px Inter;cursor:pointer;user-select:none}
+  .chip input{width:auto;margin:0;accent-color:var(--lime)}
+  .chip.on{border-color:var(--lime);color:var(--lime)}
+  .builder{background:var(--card2);border:1px dashed var(--line);border-radius:14px;padding:14px;margin-top:8px}
+  .cart{margin-top:14px}
+  .cart .item{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .cart .item:last-child{border-bottom:0}
+  .cart .item small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .cart .x{background:transparent;border:0;color:var(--red);font-weight:700;cursor:pointer;font-size:14px}
+  .total{display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:10px;border-top:2px solid var(--line)}
+  .total .display{font-size:32px;color:var(--lime)}
+  .empty{color:var(--muted);font-size:13px;padding:10px 0;text-align:center}
+  .consent{display:flex;gap:10px;align-items:flex-start;font:400 13px Inter;text-transform:none;letter-spacing:0;color:var(--muted);margin-top:16px;line-height:1.45}
+  .chip{text-transform:none;letter-spacing:0;color:var(--text)}
+  .consent input{width:auto;margin-top:3px;accent-color:var(--lime)}
+  .actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+  .actions .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .status{margin-top:16px;padding:14px;border-radius:14px;background:var(--card2);border:1px solid var(--line);font-size:14px;line-height:1.5}
+  .pill{display:inline-block;font:700 11px Inter;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+  .s-pending{background:rgba(255,200,87,.15);color:var(--amber)}
+  .s-accepted{background:rgba(31,184,122,.18);color:var(--green)}
+  .s-ready{background:rgba(198,255,61,.18);color:var(--lime)}
+  .s-delivered{background:rgba(167,171,156,.18);color:var(--muted)}
+  .s-cancelled{background:rgba(255,107,107,.15);color:var(--red)}
+  .code{font-family:ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);padding:4px 8px;border-radius:8px;color:var(--lime)}
+  .qrbox{display:flex;flex-direction:column;align-items:center;gap:14px}
+  #qr{background:#fff;padding:14px;border-radius:16px}
+  #qr img,#qr canvas{display:block}
+  .steps{display:grid;gap:10px}
+  .steps div{background:var(--card2);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5}
+  .steps b{color:var(--lime)}
+  .ownerbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .order{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;font-size:14px}
+  .order .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+  .order .meta{color:var(--muted);font-size:12px;line-height:1.5}
+  .order ul{margin:8px 0;padding-left:18px;font-size:13px}
+  .order select{margin-top:8px}
+  .cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .price-row{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:center;margin-top:8px;font-size:14px}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 0;line-height:2}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--lime);color:var(--lime-ink);font:700 13px Inter;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:50;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  @media (max-width:420px){.hero h1{font-size:50px}.row,.actions .grid,.cfg-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="display" id="brandName">GYM BRUHS</div>
+      <small id="brandSub">Healthy Stuff</small>
+    </div>
+    <div class="lang">
+      <button id="langEn" class="on">English</button>
+      <button id="langEs">Español</button>
+    </div>
+  </header>
+  <div class="loc" id="brandArea">Chandler · East Valley y alrededores</div>
+
+  <section class="hero">
+    <span class="badge" data-i18n="badge">¡PIDE TU HEALTHY STUFF!</span>
+    <h1 class="display" id="heroTitle"></h1>
+    <p data-i18n="heroP"></p>
+    <p style="margin-bottom:18px"><span data-i18n="ownersLbl">Dueños:</span> <b id="brandOwners" style="color:var(--text)">GYM BRUHS</b></p>
+    <a class="btn btn-primary" href="#pedido" data-i18n="heroBtn">Armar mi pedido ↗</a>
+  </section>
+
+  <div class="strip">
+    <span data-i18n="strip1">Solo snacks saludables</span>
+    <span id="stripOwners">GYM BRUHS</span>
+    <span id="stripArea">Chandler · East Valley</span>
+    <span class="hot" data-i18n="strip4">A tu gusto, sin excusas.</span>
+  </div>
+
+  <!-- ORDER -->
+  <section id="pedido" class="card">
+    <h2 class="display" data-i18n="orderH">Arma tu pedido.</h2>
+    <p class="lead" data-i18n="orderLead"></p>
+    <div class="note" data-i18n="orderNote"></div>
+    <div class="note" id="waNote"></div>
+
+    <label data-i18n="lName">Tu nombre</label>
+    <input id="fName" autocomplete="name">
+    <label data-i18n="lPhone">Tu teléfono / WhatsApp</label>
+    <input id="fPhone" inputmode="tel" autocomplete="tel">
+
+    <label data-i18n="lItem">Elige tu snack</label>
+    <select id="fItem"></select>
+    <div class="builder" id="builder"></div>
+
+    <div class="cart" id="cart"></div>
+
+    <label data-i18n="lZone">Zona</label>
+    <select id="fZone">
+      <option value="chandler" data-i18n="zone1">Chandler</option>
+      <option value="eastvalley" data-i18n="zone2">Gilbert · Mesa · Tempe</option>
+      <option value="other" data-i18n="zone3">Otra zona · consultar</option>
+    </select>
+
+    <label data-i18n="lDeliv">Preferencia de entrega</label>
+    <select id="fDeliv">
+      <option value="pickup" data-i18n="deliv1">Recoger · lugar por confirmar</option>
+      <option value="gym" data-i18n="deliv2">Entrega en el gym</option>
+      <option value="home" data-i18n="deliv3">Consultar entrega a domicilio</option>
+    </select>
+    <div id="delivBox" class="hidden">
+      <label data-i18n="lAddr">Domicilio / gym y referencias</label>
+      <textarea id="fAddr"></textarea>
+    </div>
+
+    <div class="row">
+      <div><label data-i18n="lDate">Fecha solicitada</label><input type="date" id="fDate"></div>
+      <div><label data-i18n="lTime">Horario solicitado</label>
+        <select id="fTime">
+          <option value="tbd" data-i18n="timeTbd">Horario por confirmar</option>
+          <option value="am" data-i18n="timeAm">Mañana · 6–10 am</option>
+          <option value="mid" data-i18n="timeMid">Mediodía · 11 am–2 pm</option>
+          <option value="pm" data-i18n="timePm">Tarde · 4–8 pm</option>
+        </select></div>
+    </div>
+
+    <label data-i18n="lCur">Moneda de pago</label>
+    <select id="fCur">
+      <option value="USD" data-i18n="curUsd">Dólares estadounidenses (USD)</option>
+      <option value="MXN" data-i18n="curMxn">Pesos mexicanos (MXN)</option>
+    </select>
+
+    <label data-i18n="lNotes">Notas o alergias (opcional)</label>
+    <textarea id="fNotes"></textarea>
+
+    <label class="consent"><input type="checkbox" id="fConsent"><span><span data-i18n="consent"></span> <a href="#seguimiento" data-i18n="consentLink">Ver resumen del pedido →</a></span></label>
+    <p class="note" style="margin-top:12px" data-i18n="privacy"></p>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btnSubmit" data-i18n="btnSubmit">Enviar solicitud de pedido</button>
+      <div class="grid">
+        <button class="btn btn-ghost btn-sm" id="btnWa" data-i18n="btnWa">Enviar al WhatsApp del negocio</button>
+        <button class="btn btn-ghost btn-sm" id="btnCopy" data-i18n="btnCopy">Copiar pedido</button>
+        <button class="btn btn-ghost btn-sm" id="btnPay" data-i18n="btnPay">Pagar en la app</button>
+        <a class="btn btn-ghost btn-sm" href="#seguimiento" data-i18n="btnStatus">Ver estado</a>
+      </div>
+    </div>
+    <div class="status hidden" id="orderStatus"></div>
+  </section>
+
+  <!-- TRACKING -->
+  <section id="seguimiento" class="card">
+    <h2 class="display" data-i18n="trackH">Seguimiento del pedido</h2>
+    <p class="lead" data-i18n="trackLead"></p>
+    <label data-i18n="lCode">Código de pedido</label>
+    <div class="row" style="grid-template-columns:1fr auto">
+      <input id="tCode" placeholder="GB-XXXX" style="text-transform:uppercase">
+      <button class="btn btn-ghost" id="btnTrack" data-i18n="btnTrack">Ver estado</button>
+    </div>
+    <div class="status hidden" id="trackOut"></div>
+  </section>
+
+  <!-- QR -->
+  <section class="card">
+    <h2 class="display" data-i18n="qrH">Comparte el gain.</h2>
+    <p class="lead" data-i18n="qrLead"></p>
+    <div class="qrbox">
+      <div id="qr"></div>
+      <button class="btn btn-ghost btn-sm" id="btnQrLink" data-i18n="btnQrLink">Copiar enlace de la app</button>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section class="card">
+    <h2 class="display" data-i18n="instH">Instalar en mi teléfono</h2>
+    <div class="steps">
+      <div><b>Android</b> · <span data-i18n="instA"></span></div>
+      <div><b>iPhone</b> · <span data-i18n="instI"></span></div>
+    </div>
+  </section>
+
+  <!-- OWNER -->
+  <section id="panel" class="card">
+    <h2 class="display" id="panelTitle">Panel de GYM BRUHS</h2>
+    <p class="lead" data-i18n="panelLead"></p>
+    <div id="panelLock">
+      <label data-i18n="lPin">PIN del negocio</label>
+      <div class="row" style="grid-template-columns:1fr auto">
+        <input id="pPin" type="password" inputmode="numeric">
+        <button class="btn btn-primary" id="btnLogin" data-i18n="btnLogin">Entrar</button>
+      </div>
+    </div>
+    <div id="panelBody" class="hidden">
+      <div class="ownerbar">
+        <button class="btn btn-ghost btn-sm" id="btnRefresh" data-i18n="btnRefresh">Actualizar pedidos</button>
+        <button class="btn btn-ghost btn-sm" id="btnCsv" data-i18n="btnCsv">Exportar pedidos CSV</button>
+        <button class="btn btn-ghost btn-sm" id="btnLogout" data-i18n="btnLogout">Salir</button>
+      </div>
+      <textarea id="csvOut" class="hidden" style="font-family:monospace;font-size:12px"></textarea>
+
+      <label data-i18n="lFilter">Filtrar por estado</label>
+      <select id="pFilter">
+        <option value="all" data-i18n="fAll">Todos</option>
+        <option value="pending" data-i18n="stPending">Pendiente</option>
+        <option value="accepted" data-i18n="stAccepted">Aceptado</option>
+        <option value="ready" data-i18n="stReady">Listo</option>
+        <option value="delivered" data-i18n="stDelivered">Entregado</option>
+        <option value="cancelled" data-i18n="stCancelled">Cancelado</option>
+      </select>
+      <div id="orderList"></div>
+
+      <h2 class="display" style="margin-top:28px;font-size:30px" data-i18n="cfgH">Configuración del negocio</h2>
+      <div class="cfg-grid">
+        <div><label data-i18n="cName">Nombre</label><input id="cName"></div>
+        <div><label data-i18n="cSub">Subtítulo</label><input id="cSub"></div>
+        <div><label data-i18n="cOwners">Dueños</label><input id="cOwners"></div>
+        <div><label data-i18n="cArea">Zona</label><input id="cArea"></div>
+        <div><label data-i18n="cWa">WhatsApp (con lada, ej. 14805551234)</label><input id="cWa" inputmode="tel"></div>
+        <div><label data-i18n="cPay">Enlace de pago (Stripe, Square, Venmo…)</label><input id="cPay" placeholder="https://"></div>
+        <div><label data-i18n="cRate">Tipo de cambio MXN por USD</label><input id="cRate" type="number" step="0.1"></div>
+        <div><label data-i18n="cPin">PIN del panel</label><input id="cPin" inputmode="numeric"></div>
+      </div>
+      <label data-i18n="cPrices">Precios (USD)</label>
+      <div id="priceList"></div>
+      <div class="actions"><button class="btn btn-primary" id="btnSaveCfg" data-i18n="btnSaveCfg">Guardar configuración</button></div>
+    </div>
+  </section>
+
+  <footer>
+    <div><span id="footName">GYM BRUHS</span> · <span id="footOwners">Healthy Stuff</span></div>
+    <div><a href="#" id="footShare" data-i18n="footShare">Compartir esta app ↗</a> · <a href="#panel" data-i18n="footPanel">Panel de dueños</a></div>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- i18n ----------
+const T = {
+  es:{
+    badge:"¡PIDE TU HEALTHY STUFF!", heroTitle:'Snacks que sí te <em>cuidan.</em>',
+    heroP:"Arma tu pedido en la app y compártelo con nosotros para confirmar precio, disponibilidad y entrega.",
+    ownersLbl:"Dueños:", heroBtn:"Armar mi pedido ↗",
+    strip1:"Solo snacks saludables", strip4:"A tu gusto, sin excusas.",
+    orderH:"Arma tu pedido.", orderLead:"Elige tu snack, personalízalo con los menús, agrega los que quieras y luego revisa y envía.",
+    orderNote:"Precio final, disponibilidad, horario y entrega se confirman con el negocio. Enviar un pedido no confirma una compra.",
+    waNoteOff:"El WhatsApp del negocio aún no está configurado: puedes copiar tu pedido o elegir con quién compartirlo.",
+    waNoteOn:"Al enviar, tu pedido se abre en WhatsApp listo para mandar al negocio.",
+    lName:"Tu nombre", lPhone:"Tu teléfono / WhatsApp", lItem:"Elige tu snack", lQty:"Cantidad", btnAdd:"Agregar al pedido",
+    cartEmpty:"Todavía no agregas nada. Elige un snack arriba.", total:"Total estimado",
+    lZone:"Zona", zone1:"Chandler", zone2:"Gilbert · Mesa · Tempe", zone3:"Otra zona · consultar",
+    lDeliv:"Preferencia de entrega", deliv1:"Recoger · lugar por confirmar", deliv2:"Entrega en el gym", deliv3:"Consultar entrega a domicilio",
+    lAddr:"Domicilio / gym y referencias", lDate:"Fecha solicitada", lTime:"Horario solicitado",
+    timeTbd:"Horario por confirmar", timeAm:"Mañana · 6–10 am", timeMid:"Mediodía · 11 am–2 pm", timePm:"Tarde · 4–8 pm",
+    lCur:"Moneda de pago", curUsd:"Dólares estadounidenses (USD)", curMxn:"Pesos mexicanos (MXN)",
+    lNotes:"Notas o alergias (opcional)",
+    consent:"Autorizo compartir mis datos con el negocio para atender este pedido.", consentLink:"Ver resumen del pedido →",
+    privacy:"Tu pedido se guarda en este teléfono y en el panel del negocio. Tu código de seguimiento es privado. El pago se arregla en la app o directo con el negocio.",
+    btnSubmit:"Enviar solicitud de pedido", btnWa:"Enviar al WhatsApp del negocio", btnCopy:"Copiar pedido", btnPay:"Pagar en la app", btnStatus:"Ver estado",
+    trackH:"Seguimiento del pedido", trackLead:"Guarda tu código. Quien lo tenga puede ver el estado del pedido en este teléfono.",
+    lCode:"Código de pedido", btnTrack:"Ver estado", trackNone:"No encontramos ese código en este teléfono.",
+    qrH:"Comparte el gain.", qrLead:"Escanea el código para abrir la app. Úsalo en el gym, en letreros y volantes.", btnQrLink:"Copiar enlace de la app",
+    instH:"Instalar en mi teléfono", instA:"Abre el menú del navegador y elige “Instalar app” o “Agregar a pantalla de inicio”.",
+    instI:"Ábrelo en Safari, toca “Compartir” y luego “Agregar a inicio”.",
+    panelLead:"Acceso protegido. Configura el negocio y atiende los pedidos.", lPin:"PIN del negocio", btnLogin:"Entrar",
+    btnRefresh:"Actualizar pedidos", btnCsv:"Exportar pedidos CSV", btnLogout:"Salir", lFilter:"Filtrar por estado", fAll:"Todos",
+    stPending:"Pendiente", stAccepted:"Aceptado", stReady:"Listo", stDelivered:"Entregado", stCancelled:"Cancelado",
+    noOrders:"Sin pedidos todavía.", cfgH:"Configuración del negocio", cName:"Nombre", cSub:"Subtítulo", cOwners:"Dueños", cArea:"Zona",
+    cWa:"WhatsApp (con lada, ej. 14805551234)", cPay:"Enlace de pago (Stripe, Square, Venmo…)", cRate:"Tipo de cambio MXN por USD", cPin:"PIN del panel",
+    cPrices:"Precios (USD)", btnSaveCfg:"Guardar configuración", footShare:"Compartir esta app ↗", footPanel:"Panel de dueños",
+    statusPending:"Pedido pendiente de aceptación por el negocio.", yourCode:"Tu código:", payTbd:"Pago por confirmar con el negocio.", payGo:"Abrir enlace de pago →",
+    errName:"Escribe tu nombre y teléfono.", errCart:"Agrega al menos un snack.", errConsent:"Marca la autorización para continuar.",
+    copied:"Copiado ✓", saved:"Guardado ✓", badPin:"PIN incorrecto", waOff:"Primero configura el WhatsApp en el panel.",
+    each:"c/u", qty:"Cant.", panelOf:"Panel de", sent:"Pedido enviado ✓", linkCopied:"Enlace copiado ✓",
+    addons:"Extras", noneOpt:"Sin extras", pickFirst:"Elige una opción", payFirst:"Primero envía tu pedido."
+  },
+  en:{
+    badge:"ORDER YOUR HEALTHY STUFF!", heroTitle:'Snacks that actually <em>care.</em>',
+    heroP:"Build your order in the app and share it with us to confirm price, availability and delivery.",
+    ownersLbl:"Owners:", heroBtn:"Build my order ↗",
+    strip1:"Healthy snacks only", strip4:"Your way, no excuses.",
+    orderH:"Build your order.", orderLead:"Pick a snack, customize it with the menus, add as many as you want, then review and send.",
+    orderNote:"Final price, availability, hours and delivery are confirmed with the business. Sending an order does not confirm a purchase.",
+    waNoteOff:"The business WhatsApp isn't set up yet: you can copy your order or choose who to share it with.",
+    waNoteOn:"When you send, your order opens in WhatsApp ready to go to the business.",
+    lName:"Your name", lPhone:"Your phone / WhatsApp", lItem:"Pick your snack", lQty:"Quantity", btnAdd:"Add to order",
+    cartEmpty:"Nothing added yet. Pick a snack above.", total:"Estimated total",
+    lZone:"Area", zone1:"Chandler", zone2:"Gilbert · Mesa · Tempe", zone3:"Other area · ask",
+    lDeliv:"Delivery preference", deliv1:"Pickup · location to confirm", deliv2:"Drop-off at the gym", deliv3:"Ask about home delivery",
+    lAddr:"Address / gym and landmarks", lDate:"Requested date", lTime:"Requested time",
+    timeTbd:"Time to confirm", timeAm:"Morning · 6–10 am", timeMid:"Midday · 11 am–2 pm", timePm:"Evening · 4–8 pm",
+    lCur:"Payment currency", curUsd:"US dollars (USD)", curMxn:"Mexican pesos (MXN)",
+    lNotes:"Notes or allergies (optional)",
+    consent:"I authorize sharing my details with the business to handle this order.", consentLink:"See order summary →",
+    privacy:"Your order is saved on this phone and in the business panel. Your tracking code is private. Payment is arranged in-app or directly with the business.",
+    btnSubmit:"Send order request", btnWa:"Send to business WhatsApp", btnCopy:"Copy order", btnPay:"Pay in app", btnStatus:"View status",
+    trackH:"Order tracking", trackLead:"Save your code. Anyone with it can see the order status on this phone.",
+    lCode:"Order code", btnTrack:"View status", trackNone:"We couldn't find that code on this phone.",
+    qrH:"Share the gains.", qrLead:"Scan the code to open the app. Use it at the gym, on signs and flyers.", btnQrLink:"Copy app link",
+    instH:"Install on my phone", instA:"Open the browser menu and choose “Install app” or “Add to Home screen”.",
+    instI:"Open in Safari, tap “Share”, then “Add to Home Screen”.",
+    panelLead:"Protected area. Configure the business and handle orders.", lPin:"Business PIN", btnLogin:"Sign in",
+    btnRefresh:"Refresh orders", btnCsv:"Export orders CSV", btnLogout:"Sign out", lFilter:"Filter by status", fAll:"All",
+    stPending:"Pending", stAccepted:"Accepted", stReady:"Ready", stDelivered:"Delivered", stCancelled:"Cancelled",
+    noOrders:"No orders yet.", cfgH:"Business settings", cName:"Name", cSub:"Subtitle", cOwners:"Owners", cArea:"Area",
+    cWa:"WhatsApp (with country code, e.g. 14805551234)", cPay:"Payment link (Stripe, Square, Venmo…)", cRate:"MXN per USD rate", cPin:"Panel PIN",
+    cPrices:"Prices (USD)", btnSaveCfg:"Save settings", footShare:"Share this app ↗", footPanel:"Owner panel",
+    statusPending:"Order pending acceptance by the business.", yourCode:"Your code:", payTbd:"Payment to be confirmed with the business.", payGo:"Open payment link →",
+    errName:"Enter your name and phone.", errCart:"Add at least one snack.", errConsent:"Check the authorization to continue.",
+    copied:"Copied ✓", saved:"Saved ✓", badPin:"Wrong PIN", waOff:"Set up WhatsApp in the panel first.",
+    each:"each", qty:"Qty", panelOf:"Panel ·", sent:"Order sent ✓", linkCopied:"Link copied ✓",
+    addons:"Extras", noneOpt:"No extras", pickFirst:"Pick an option", payFirst:"Send your order first."
+  }
+};
+let lang = 'en';
+const t = k => (T[lang][k] ?? T.es[k] ?? k);
+
+// ---------- Menu ----------
+const MENU = [
+  {id:'shake', name:{es:'Protein Shake',en:'Protein Shake'}, price:7,
+    opts:[
+      {k:'flavor', label:{es:'Sabor',en:'Flavor'}, ch:[{v:'van',es:'Vainilla',en:'Vanilla'},{v:'choc',es:'Chocolate',en:'Chocolate'},{v:'fresa',es:'Fresa',en:'Strawberry'},{v:'cafe',es:'Café',en:'Coffee'}]},
+      {k:'base', label:{es:'Base',en:'Base'}, ch:[{v:'agua',es:'Agua',en:'Water'},{v:'leche',es:'Leche',en:'Milk'},{v:'almendra',es:'Leche de almendra',en:'Almond milk'},{v:'avena',es:'Leche de avena',en:'Oat milk'}]},
+      {k:'size', label:{es:'Tamaño',en:'Size'}, ch:[{v:'16',es:'16 oz',en:'16 oz'},{v:'24',es:'24 oz (+$2)',en:'24 oz (+$2)',p:2}]}
+    ],
+    addons:[{v:'platano',es:'Plátano',en:'Banana',p:1},{v:'pb',es:'Crema de cacahuate',en:'Peanut butter',p:1},{v:'creatina',es:'Creatina',en:'Creatine',p:1.5},{v:'avena',es:'Avena',en:'Oats',p:1}]},
+  {id:'bowl', name:{es:'Smoothie Bowl',en:'Smoothie Bowl'}, price:9,
+    opts:[{k:'base', label:{es:'Base',en:'Base'}, ch:[{v:'acai',es:'Açaí',en:'Açaí'},{v:'mango',es:'Mango',en:'Mango'},{v:'berry',es:'Frutos rojos',en:'Mixed berry'},{v:'pitaya',es:'Pitaya',en:'Dragon fruit'}]}],
+    addons:[{v:'granola',es:'Granola',en:'Granola',p:0},{v:'coco',es:'Coco',en:'Coconut',p:0},{v:'chia',es:'Chía',en:'Chia',p:0},{v:'miel',es:'Miel',en:'Honey',p:0.5},{v:'pb',es:'Crema de cacahuate',en:'Peanut butter',p:1}]},
+  {id:'oats', name:{es:'Overnight Oats',en:'Overnight Oats'}, price:5,
+    opts:[{k:'flavor', label:{es:'Sabor',en:'Flavor'}, ch:[{v:'manzana',es:'Manzana canela',en:'Cinnamon apple'},{v:'pb',es:'PB & plátano',en:'PB & banana'},{v:'choc',es:'Chocolate chip',en:'Chocolate chip'},{v:'berry',es:'Frutos rojos',en:'Berry'}]},
+      {k:'milk', label:{es:'Leche',en:'Milk'}, ch:[{v:'leche',es:'Leche',en:'Milk'},{v:'almendra',es:'Almendra',en:'Almond'},{v:'avena',es:'Avena',en:'Oat'}]}],
+    addons:[{v:'proteina',es:'Scoop de proteína',en:'Protein scoop',p:1.5}]},
+  {id:'wrap', name:{es:'Wrap de pollo',en:'Chicken Wrap'}, price:9,
+    opts:[{k:'tortilla', label:{es:'Tortilla',en:'Tortilla'}, ch:[{v:'integral',es:'Integral',en:'Whole wheat'},{v:'espinaca',es:'Espinaca',en:'Spinach'},{v:'lowcarb',es:'Low carb',en:'Low carb'}]},
+      {k:'salsa', label:{es:'Salsa',en:'Sauce'}, ch:[{v:'chipotle',es:'Chipotle light',en:'Light chipotle'},{v:'ranch',es:'Ranch griego',en:'Greek ranch'},{v:'sin',es:'Sin salsa',en:'No sauce'}]}],
+    addons:[{v:'aguacate',es:'Aguacate',en:'Avocado',p:1.5},{v:'queso',es:'Queso',en:'Cheese',p:0.75},{v:'extrapollo',es:'Doble pollo',en:'Double chicken',p:3}]},
+  {id:'eggs', name:{es:'Egg Bites (4)',en:'Egg Bites (4)'}, price:6,
+    opts:[{k:'style', label:{es:'Estilo',en:'Style'}, ch:[{v:'tocino',es:'Tocino de pavo & cheddar',en:'Turkey bacon & cheddar'},{v:'veg',es:'Veggie',en:'Veggie'},{v:'jalap',es:'Jalapeño & queso',en:'Jalapeño & cheese'}]}],
+    addons:[]},
+  {id:'balls', name:{es:'Protein Balls',en:'Protein Balls'}, price:5,
+    opts:[{k:'flavor', label:{es:'Sabor',en:'Flavor'}, ch:[{v:'pb',es:'Crema de cacahuate',en:'Peanut butter'},{v:'coco',es:'Coco almendra',en:'Coconut almond'},{v:'choc',es:'Chocolate',en:'Chocolate'}]},
+      {k:'pack', label:{es:'Paquete',en:'Pack'}, ch:[{v:'6',es:'6 piezas',en:'6 pieces'},{v:'12',es:'12 piezas (+$4)',en:'12 pieces (+$4)',p:4}]}],
+    addons:[]},
+  {id:'agua', name:{es:'Agua fresca sin azúcar',en:'Sugar-free agua fresca'}, price:3.5,
+    opts:[{k:'flavor', label:{es:'Sabor',en:'Flavor'}, ch:[{v:'jamaica',es:'Jamaica',en:'Hibiscus'},{v:'pepino',es:'Pepino limón',en:'Cucumber lime'},{v:'sandia',es:'Sandía',en:'Watermelon'},{v:'horchata',es:'Horchata light',en:'Light horchata'}]},
+      {k:'size', label:{es:'Tamaño',en:'Size'}, ch:[{v:'16',es:'16 oz',en:'16 oz'},{v:'32',es:'32 oz (+$1.5)',en:'32 oz (+$1.5)',p:1.5}]}],
+    addons:[]},
+  {id:'chips', name:{es:'Chips de camote',en:'Sweet potato chips'}, price:4,
+    opts:[{k:'season', label:{es:'Sazón',en:'Seasoning'}, ch:[{v:'sal',es:'Sal de mar',en:'Sea salt'},{v:'tajin',es:'Tajín',en:'Tajín'},{v:'bbq',es:'BBQ',en:'BBQ'}]}],
+    addons:[]}
+];
+
+// ---------- Config & storage ----------
+const DEF_CFG = {name:'GYM BRUHS', sub:'Healthy Stuff', owners:'GYM BRUHS', area:'Chandler · East Valley', wa:'', pay:'', rate:18, pin:'1234', prices:{}};
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+let cfg = Object.assign({}, DEF_CFG, store.get('gb_config', {}));
+let orders = store.get('gb_orders', []);
+let cart = [];
+let lastOrder = null;
+let unlocked = false;
+
+const $ = id => document.getElementById(id);
+const price = item => (cfg.prices && cfg.prices[item.id] != null) ? Number(cfg.prices[item.id]) : item.price;
+const fmt = (usd, cur) => cur==='MXN' ? `$${(usd*cfg.rate).toFixed(0)} MXN` : `$${usd.toFixed(2)} USD`;
+const toast = m => { const el=$('toast'); el.textContent=m; el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),1800); };
+async function copy(text){ try{ await navigator.clipboard.writeText(text); toast(t('copied')); }catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy'); toast(t('copied'));}catch(_){} ta.remove(); } }
+
+// ---------- Render ----------
+function applyLang(){
+  document.documentElement.lang = lang;
+  $('langEs').classList.toggle('on', lang==='es'); $('langEn').classList.toggle('on', lang==='en');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  $('heroTitle').innerHTML = t('heroTitle');
+  $('waNote').textContent = cfg.wa ? t('waNoteOn') : t('waNoteOff');
+  renderBrand(); renderItems(); renderBuilder(); renderCart(); renderOrders(); renderPrices();
+  if(lastOrder) showStatus(lastOrder);
+}
+function renderBrand(){
+  $('brandName').textContent = cfg.name; $('brandSub').textContent = cfg.sub; $('brandOwners').textContent = cfg.owners;
+  $('brandArea').textContent = cfg.area + (lang==='es' ? ' y alrededores' : ' & nearby');
+  $('stripOwners').textContent = cfg.owners; $('stripArea').textContent = cfg.area;
+  $('panelTitle').textContent = `${t('panelOf')} ${cfg.owners}`;
+  $('footName').textContent = cfg.name; $('footOwners').textContent = cfg.owners;
+  document.title = `${cfg.name} · ${cfg.sub}`;
+}
+function renderItems(){
+  const sel=$('fItem'); const cur=sel.value;
+  sel.innerHTML = MENU.map(m=>`<option value="${m.id}">${m.name[lang]} · $${price(m).toFixed(2)}</option>`).join('');
+  if(cur) sel.value=cur;
+}
+function renderBuilder(){
+  const m = MENU.find(x=>x.id===$('fItem').value) || MENU[0];
+  let h = '';
+  m.opts.forEach(o=>{
+    h += `<label>${o.label[lang]}</label><select data-opt="${o.k}">${o.ch.map(c=>`<option value="${c.v}">${c[lang]}</option>`).join('')}</select>`;
+  });
+  if(m.addons.length){
+    h += `<label>${t('addons')}</label><div class="chips">${m.addons.map(a=>`<label class="chip"><input type="checkbox" data-addon="${a.v}">${a[lang]}${a.p?` +$${a.p}`:''}</label>`).join('')}</div>`;
+  }
+  h += `<label>${t('lQty')}</label><select id="bQty">${[1,2,3,4,5,6,8,10,12].map(n=>`<option>${n}</option>`).join('')}</select>`;
+  h += `<div class="actions" style="margin-top:14px"><button class="btn btn-primary btn-sm" id="btnAdd">${t('btnAdd')}</button></div>`;
+  $('builder').innerHTML = h;
+  $('builder').querySelectorAll('.chip input').forEach(i=>i.addEventListener('change',e=>e.target.closest('.chip').classList.toggle('on',e.target.checked)));
+  $('btnAdd').onclick = addToCart;
+}
+function addToCart(){
+  const m = MENU.find(x=>x.id===$('fItem').value);
+  const sels = [...$('builder').querySelectorAll('select[data-opt]')];
+  const choice = {}; let extra = 0; const labels = {es:[],en:[]};
+  sels.forEach(s=>{ const o=m.opts.find(o=>o.k===s.dataset.opt); const c=o.ch.find(c=>c.v===s.value); choice[o.k]=c.v; extra+=c.p||0; labels.es.push(c.es); labels.en.push(c.en); });
+  const addons = [...$('builder').querySelectorAll('input[data-addon]:checked')].map(i=>m.addons.find(a=>a.v===i.dataset.addon));
+  addons.forEach(a=>{ extra+=a.p||0; labels.es.push('+'+a.es); labels.en.push('+'+a.en); });
+  const qty = Number($('bQty').value);
+  cart.push({id:m.id, name:m.name, qty, unit:price(m)+extra, labels, choice, addons:addons.map(a=>a.v)});
+  renderCart(); toast('+1');
+}
+function cartTotal(){ return cart.reduce((s,i)=>s+i.unit*i.qty,0); }
+function renderCart(){
+  const cur=$('fCur').value;
+  if(!cart.length){ $('cart').innerHTML=`<div class="empty">${t('cartEmpty')}</div>`; return; }
+  $('cart').innerHTML = cart.map((i,ix)=>`<div class="item"><div><b>${i.qty}× ${i.name[lang]}</b><small>${i.labels[lang].join(' · ')||'—'}</small></div><div style="text-align:right;white-space:nowrap">${fmt(i.unit*i.qty,cur)}<br><button class="x" data-rm="${ix}">✕</button></div></div>`).join('')
+    + `<div class="total"><span>${t('total')}</span><span class="display">${fmt(cartTotal(),cur)}</span></div>`;
+  $('cart').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{cart.splice(Number(b.dataset.rm),1); renderCart();});
+}
+
+// ---------- Orders ----------
+const STATUS = ['pending','accepted','ready','delivered','cancelled'];
+const stLabel = s => t('st'+s[0].toUpperCase()+s.slice(1));
+function makeCode(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='GB-'; for(let i=0;i<4;i++) c+=a[Math.floor(Math.random()*a.length)]; return orders.some(o=>o.code===c)?makeCode():c; }
+function orderText(o){
+  const L = lang;
+  const lines = [
+    `${cfg.name} · ${L==='es'?'Pedido':'Order'} ${o.code}`,
+    `${L==='es'?'Nombre':'Name'}: ${o.name}`, `${L==='es'?'Tel':'Phone'}: ${o.phone}`,
+    '',
+    ...o.items.map(i=>`• ${i.qty}× ${i.name[L]} (${i.labels[L].join(', ')||'-'}) — ${fmt(i.unit*i.qty,o.cur)}`),
+    '',
+    `${t('total')}: ${fmt(o.total,o.cur)}`,
+    `${t('lZone')}: ${t({chandler:'zone1',eastvalley:'zone2',other:'zone3'}[o.zone])}`,
+    `${t('lDeliv')}: ${t({pickup:'deliv1',gym:'deliv2',home:'deliv3'}[o.deliv])}${o.addr?' — '+o.addr:''}`,
+    `${t('lDate')}: ${o.date||'—'} · ${t({tbd:'timeTbd',am:'timeAm',mid:'timeMid',pm:'timePm'}[o.time])}`,
+    o.notes?`${t('lNotes')}: ${o.notes}`:''
+  ];
+  return lines.filter(x=>x!==undefined).join('\n');
+}
+function submitOrder(){
+  const name=$('fName').value.trim(), phone=$('fPhone').value.trim();
+  if(!name||!phone) return toast(t('errName'));
+  if(!cart.length) return toast(t('errCart'));
+  if(!$('fConsent').checked) return toast(t('errConsent'));
+  const o = {code:makeCode(), ts:Date.now(), name, phone, items:cart.map(i=>({...i})), total:cartTotal(), cur:$('fCur').value,
+    zone:$('fZone').value, deliv:$('fDeliv').value, addr:$('fAddr').value.trim(), date:$('fDate').value, time:$('fTime').value, notes:$('fNotes').value.trim(), status:'pending'};
+  orders.unshift(o); store.set('gb_orders',orders); lastOrder=o;
+  showStatus(o); renderOrders(); toast(t('sent'));
+  $('tCode').value=o.code;
+}
+function showStatus(o){
+  const payHtml = cfg.pay ? `<a href="${cfg.pay}" target="_blank" rel="noopener">${t('payGo')}</a>` : t('payTbd');
+  $('orderStatus').classList.remove('hidden');
+  $('orderStatus').innerHTML = `<span class="pill s-${o.status}">${stLabel(o.status)}</span><div style="margin-top:8px">${o.status==='pending'?t('statusPending'):''}</div><div style="margin-top:8px">${t('yourCode')} <span class="code">${o.code}</span> · ${fmt(o.total,o.cur)}</div><div style="margin-top:8px">${payHtml}</div>`;
+  $('orderStatus').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function sendWa(){
+  const o = lastOrder || previewOrder(); if(!o) return;
+  if(!cfg.wa) return toast(t('waOff'));
+  const url = `https://wa.me/${cfg.wa.replace(/\D/g,'')}?text=${encodeURIComponent(orderText(o))}`;
+  const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove();
+}
+function previewOrder(){
+  if(!cart.length) { toast(t('errCart')); return null; }
+  return {code:'—', name:$('fName').value||'—', phone:$('fPhone').value||'—', items:cart, total:cartTotal(), cur:$('fCur').value, zone:$('fZone').value, deliv:$('fDeliv').value, addr:$('fAddr').value, date:$('fDate').value, time:$('fTime').value, notes:$('fNotes').value, status:'pending'};
+}
+function track(){
+  const c=$('tCode').value.trim().toUpperCase(); const o=orders.find(o=>o.code===c);
+  $('trackOut').classList.remove('hidden');
+  $('trackOut').innerHTML = o ? `<span class="pill s-${o.status}">${stLabel(o.status)}</span><div style="margin-top:8px;white-space:pre-line">${orderText(o)}</div>` : t('trackNone');
+}
+
+// ---------- Owner panel ----------
+function renderOrders(){
+  if(!unlocked) return;
+  const f=$('pFilter').value; const list=orders.filter(o=>f==='all'||o.status===f);
+  $('orderList').innerHTML = list.length ? list.map(o=>`<div class="order"><div class="top"><b>${o.code} · ${o.name}</b><span class="pill s-${o.status}">${stLabel(o.status)}</span></div>
+    <div class="meta">${new Date(o.ts).toLocaleString()} · ${o.phone} · ${fmt(o.total,o.cur)}<br>${t({pickup:'deliv1',gym:'deliv2',home:'deliv3'}[o.deliv])}${o.addr?' — '+o.addr:''} · ${o.date||'—'}</div>
+    <ul>${o.items.map(i=>`<li>${i.qty}× ${i.name[lang]} <span style="color:var(--muted)">${i.labels[lang].join(', ')}</span></li>`).join('')}</ul>
+    ${o.notes?`<div class="meta">📝 ${o.notes}</div>`:''}
+    <select data-st="${o.code}">${STATUS.map(s=>`<option value="${s}" ${s===o.status?'selected':''}>${stLabel(s)}</option>`).join('')}</select></div>`).join('')
+    : `<div class="empty">${t('noOrders')}</div>`;
+  $('orderList').querySelectorAll('[data-st]').forEach(s=>s.onchange=()=>{ const o=orders.find(o=>o.code===s.dataset.st); o.status=s.value; store.set('gb_orders',orders); renderOrders(); if(lastOrder&&lastOrder.code===o.code) showStatus(o); toast(t('saved')); });
+}
+function renderPrices(){
+  $('priceList').innerHTML = MENU.map(m=>`<div class="price-row"><span>${m.name[lang]}</span><input type="number" step="0.25" data-price="${m.id}" value="${price(m)}"></div>`).join('');
+}
+function exportCsv(){
+  const esc=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const rows=[['code','date','status','name','phone','items','total','currency','zone','delivery','address','req_date','req_time','notes'].join(',')];
+  orders.forEach(o=>rows.push([o.code,new Date(o.ts).toISOString(),o.status,o.name,o.phone,o.items.map(i=>`${i.qty}x ${i.name.es} (${i.labels.es.join('; ')})`).join(' | '),o.total.toFixed(2),o.cur,o.zone,o.deliv,o.addr,o.date,o.time,o.notes].map(esc).join(',')));
+  const csv=rows.join('\n'); $('csvOut').value=csv; $('csvOut').classList.remove('hidden'); copy(csv);
+}
+function unlock(){ unlocked=true; $('panelLock').classList.add('hidden'); $('panelBody').classList.remove('hidden');
+  $('cName').value=cfg.name; $('cSub').value=cfg.sub; $('cOwners').value=cfg.owners; $('cArea').value=cfg.area; $('cWa').value=cfg.wa; $('cPay').value=cfg.pay; $('cRate').value=cfg.rate; $('cPin').value=cfg.pin;
+  renderOrders(); renderPrices(); }
+function saveCfg(){
+  cfg.name=$('cName').value.trim()||DEF_CFG.name; cfg.sub=$('cSub').value.trim(); cfg.owners=$('cOwners').value.trim()||cfg.name; cfg.area=$('cArea').value.trim();
+  cfg.wa=$('cWa').value.replace(/\D/g,''); cfg.pay=$('cPay').value.trim(); cfg.rate=Number($('cRate').value)||18; cfg.pin=$('cPin').value.trim()||'1234';
+  cfg.prices={}; $('priceList').querySelectorAll('[data-price]').forEach(i=>{ cfg.prices[i.dataset.price]=Number(i.value); });
+  store.set('gb_config',cfg); applyLang(); toast(t('saved'));
+}
+
+// ---------- Wire up ----------
+$('langEs').onclick=()=>{lang='es';applyLang();}; $('langEn').onclick=()=>{lang='en';applyLang();};
+$('fItem').onchange=renderBuilder; $('fCur').onchange=renderCart;
+$('fDeliv').onchange=()=>$('delivBox').classList.toggle('hidden',$('fDeliv').value==='pickup');
+$('btnSubmit').onclick=submitOrder; $('btnWa').onclick=sendWa;
+$('btnCopy').onclick=()=>{ const o=lastOrder||previewOrder(); if(o) copy(orderText(o)); };
+$('btnPay').onclick=()=>{ if(!lastOrder) return toast(t('payFirst')); if(!cfg.pay) return toast(t('payTbd')); const a=document.createElement('a'); a.href=cfg.pay; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); };
+$('btnTrack').onclick=track; $('tCode').addEventListener('keydown',e=>{if(e.key==='Enter')track();});
+$('btnLogin').onclick=()=>{ if($('pPin').value===cfg.pin) unlock(); else toast(t('badPin')); };
+$('pPin').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnLogin').click();});
+$('btnLogout').onclick=()=>{ unlocked=false; $('panelBody').classList.add('hidden'); $('panelLock').classList.remove('hidden'); $('pPin').value=''; };
+$('btnRefresh').onclick=()=>{ orders=store.get('gb_orders',[]); renderOrders(); toast('✓'); };
+$('btnCsv').onclick=exportCsv; $('pFilter').onchange=renderOrders; $('btnSaveCfg').onclick=saveCfg;
+const appUrl = location.href.split('#')[0];
+$('btnQrLink').onclick=()=>copy(appUrl); $('footShare').onclick=e=>{e.preventDefault();copy(appUrl);};
+try{ new QRCode($('qr'),{text:appUrl,width:180,height:180,colorDark:'#0e0f0c',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }catch(e){ $('qr').textContent=appUrl; }
+const today=new Date(); $('fDate').min=today.toISOString().slice(0,10);
+applyLang();
+
+// Auto-unlock the panel for the artifact owner when viewed on claude.ai
+(async()=>{ try{ if(window.claude&&claude.use){ const u=await claude.use('user'); if(u&&u.isOwner&&await u.isOwner()) unlock(); } }catch(e){} })();
+</script>
+</body>
+</html>
