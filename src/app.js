@@ -85,7 +85,7 @@ function createApp(config = {}) {
   });
 
   app.use(express.json({ limit: '64kb' }));
-  app.use('/api', (req, res, next) => { db.ready.then(() => next(), next); });
+  app.use('/api', (req, res, next) => { db.ensureReady().then(() => next(), next); });
 
   // Wrap async handlers so rejections reach the error handler.
   const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);

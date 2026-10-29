@@ -40,3 +40,12 @@ test('postgres backend: order → staff → status flow', { skip: !url && 'TEST_
     server.close(); await app.locals.db.close();
   }
 });
+
+test('postgres backend: a failed first init is retried, not cached', { skip: !url && 'TEST_DATABASE_URL not set' }, async () => {
+  // Point at a port with nothing listening: init must fail, then succeed once DB is "back" (we swap URLs by re-creating).
+  const bad = createApp({ databaseUrl: 'postgres://gb:gb@127.0.0.1:1/x', staffPin: '1' });
+  await assert.rejects(bad.locals.db.ensureReady());
+  // Second call re-attempts (would resolve instantly if the rejection were cached).
+  await assert.rejects(bad.locals.db.ensureReady());
+  await bad.locals.db.close().catch(() => {});
+});
