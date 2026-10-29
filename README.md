@@ -26,7 +26,7 @@ Features:
 - **Cooler QR** posters: scanning preselects that pickup spot.
 - Staff screen can **scan QR with the phone camera** (browsers with BarcodeDetector) or type the code.
 - Installable as a home-screen app (PWA manifest + icons).
-- SQLite storage (one file), no external services required to run.
+- SQLite storage locally (one file, no services needed); Postgres (Neon) when hosted.
 
 ## Run it
 
@@ -48,7 +48,9 @@ npm start                # http://localhost:3000
 | `STRIPE_SECRET_KEY` | Enables "Pay now". Leave empty → only "pay at counter" is offered. |
 | `STRIPE_WEBHOOK_SECRET` | Optional. Lets Stripe push `checkout.session.completed` to `/api/stripe/webhook`. Without it, payment is still confirmed when the customer returns to the order page. |
 | `DEMO_PAYMENTS` | `1` adds a fake "simulate card payment" button. **Local demos only.** |
-| `DB_FILE` | SQLite path. Default `./data/gym-bruhs.sqlite`. |
+| `DB_FILE` | SQLite path (local/single-box). Default `./data/gym-bruhs.sqlite`. |
+| `DATABASE_URL` | Postgres connection string. When set, Postgres is used instead of SQLite (required on Vercel). |
+| `PG_SCHEMA` | Postgres schema to keep tables in. Default `gym_bruhs`, so the app can share a database with other apps. |
 
 ### Stripe setup (when you're ready to take real money)
 
@@ -61,7 +63,8 @@ npm start                # http://localhost:3000
 ## Verify
 
 ```sh
-npm test              # 9 API tests (node:test) — validation, pricing, staff auth, Stripe flow, QR
+npm test              # 10 API tests (node:test) — validation, pricing, staff auth, Stripe flow, QR
+                      # set TEST_DATABASE_URL=postgres://... to also exercise the Postgres backend
 npm run test:browser  # headless-browser run-through at phone size; screenshots in test-results/
 ```
 
@@ -79,7 +82,9 @@ docker run -d --env-file .env -p 3000:3000 -v gymbruhs-data:/data gym-bruhs
 **Any Node host** (Railway, Render, Fly, a VPS): `npm ci && npm start`, set the env vars, mount
 persistent storage for `DB_FILE`. The app sets `trust proxy`, so it works behind a TLS proxy.
 
-> Vercel/Netlify functions are not a fit — the app keeps a SQLite file on disk.
+**Vercel + Postgres (Neon)** — this is how the live site runs. `api/index.js` + `vercel.json` route every
+request to the Express app. Set `DATABASE_URL`, `STAFF_PIN`, `BASE_URL` (and Stripe vars) in the project's
+environment variables. SQLite is not used on Vercel (read-only filesystem).
 
 ## Editing the menu
 

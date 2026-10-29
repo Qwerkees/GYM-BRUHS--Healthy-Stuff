@@ -54,35 +54,21 @@ function createApp(config = {}) {
     stripeWebhookSecret: config.stripeWebhookSecret ?? process.env.STRIPE_WEBHOOK_SECRET ?? '',
     demoPayments: String(config.demoPayments ?? process.env.DEMO_PAYMENTS ?? '') === '1',
     stripeClient: config.stripeClient || null,
+    databaseUrl: config.databaseUrl ?? process.env.DATABASE_URL ?? '',
+    pgSchema: config.pgSchema ?? process.env.PG_SCHEMA ?? 'gym_bruhs',
   };
   if (!(cfg.taxRate >= 0 && cfg.taxRate < 1)) throw new Error('TAX_RATE must be between 0 and 1');
 
-  const db = openDb(cfg.dbFile);
+  const db = openDb({ databaseUrl: cfg.databaseUrl, sqliteFile: cfg.dbFile, pgSchema: cfg.pgSchema });
   const stripe = cfg.stripeClient || (cfg.stripeSecret ? require('stripe')(cfg.stripeSecret) : null);
   const cardEnabled = Boolean(stripe) || cfg.demoPayments;
-
-  const q = {
-    locations: db.prepare('SELECT slug, name, kind FROM locations WHERE active = 1 ORDER BY id'),
-    location: db.prepare('SELECT slug, name, kind FROM locations WHERE slug = ? AND active = 1'),
-    insertOrder: db.prepare(`INSERT INTO orders
-      (code, location_slug, customer_name, phone, lang, items_json, subtotal_cents, tax_cents, total_cents, payment_method, status)
-      VALUES (@code, @location_slug, @customer_name, @phone, @lang, @items_json, @subtotal_cents, @tax_cents, @total_cents, @payment_method, @status)`),
-    order: db.prepare('SELECT * FROM orders WHERE code = ?'),
-    setStatus: db.prepare('UPDATE orders SET status = ?, updated_at = ? WHERE code = ?'),
-    setStripe: db.prepare('UPDATE orders SET stripe_session = ?, updated_at = ? WHERE code = ?'),
-    recent: db.prepare(`SELECT * FROM orders WHERE created_at >= ? ORDER BY created_at DESC LIMIT 300`),
-    insertSession: db.prepare('INSERT INTO staff_sessions (token, expires_at) VALUES (?, ?)'),
-    session: db.prepare('SELECT token FROM staff_sessions WHERE token = ? AND expires_at > ?'),
-    deleteSession: db.prepare('DELETE FROM staff_sessions WHERE token = ?'),
-    purgeSessions: db.prepare('DELETE FROM staff_sessions WHERE expires_at <= ?'),
-  };
 
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
 
   // Stripe needs the raw body to verify webhook signatures — mount before json().
-  app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
     if (!stripe || !cfg.stripeWebhookSecret) return res.status(404).json({ error: 'Webhook not configured' });
     let event;
     try {
@@ -93,12 +79,16 @@ function createApp(config = {}) {
     if (event.type === 'checkout.session.completed' || event.type === 'checkout.session.async_payment_succeeded') {
       const session = event.data.object;
       const code = session.metadata && session.metadata.order_code;
-      if (code && session.payment_status === 'paid') markPaid(code, session.id);
+      if (code && session.payment_status === 'paid') return markPaid(code, session.id).then(() => res.json({ received: true }), next);
     }
     res.json({ received: true });
   });
 
   app.use(express.json({ limit: '64kb' }));
+  app.use('/api', (req, res, next) => { db.ready.then(() => next(), next); });
+
+  // Wrap async handlers so rejections reach the error handler.
+  const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -121,11 +111,11 @@ function createApp(config = {}) {
     return b.n > max;
   }
 
-  function markPaid(code, stripeSession) {
-    const o = q.order.get(code);
+  async function markPaid(code, stripeSession) {
+    const o = await db.order(code);
     if (!o) return false;
-    if (stripeSession) q.setStripe.run(stripeSession, nowIso(), code);
-    if (o.status === 'awaiting_payment') q.setStatus.run('paid', nowIso(), code);
+    if (stripeSession) await db.setStripe(stripeSession, nowIso(), code);
+    if (o.status === 'awaiting_payment') await db.setStatus('paid', nowIso(), code);
     return true;
   }
 
@@ -154,20 +144,20 @@ function createApp(config = {}) {
 
   app.get('/api/healthz', (req, res) => res.json({ ok: true, time: nowIso() }));
 
-  app.get('/api/config', (req, res) => {
+  app.get('/api/config', wrap(async (req, res) => {
     res.json({
       cardEnabled,
       demoPayments: cfg.demoPayments,
       taxRate: cfg.taxRate,
-      locations: q.locations.all(),
+      locations: await db.locations(),
     });
-  });
+  }));
 
   app.get('/api/menu', (req, res) => {
     res.json({ categories: CATEGORIES, items: ITEMS });
   });
 
-  app.post('/api/orders', (req, res) => {
+  app.post('/api/orders', wrap(async (req, res) => {
     if (limited(`order:${req.ip}`, 30, 10 * 60 * 1000)) return res.status(429).json({ error: 'Too many orders, slow down.' });
     const body = req.body || {};
     const name = cleanText(body.name, 60);
@@ -175,7 +165,7 @@ function createApp(config = {}) {
     const phone = cleanPhone(body.phone);
     if (phone === null) return res.status(400).json({ error: 'Phone number looks wrong.' });
     const lang = body.lang === 'es' ? 'es' : 'en';
-    const loc = q.location.get(cleanText(body.location, 40) || 'front-counter');
+    const loc = await db.location(cleanText(body.location, 40) || 'front-counter');
     if (!loc) return res.status(400).json({ error: 'Unknown pickup location.' });
     const payment = body.payment === 'card' ? 'card' : body.payment === 'counter' ? 'counter' : null;
     if (!payment) return res.status(400).json({ error: 'Pick a payment method.' });
@@ -197,12 +187,12 @@ function createApp(config = {}) {
     let code;
     for (let i = 0; i < 5; i++) {
       code = makeCode();
-      if (!q.order.get(code)) break;
+      if (!(await db.order(code))) break;
       code = null;
     }
     if (!code) return res.status(500).json({ error: 'Could not allocate an order code.' });
 
-    q.insertOrder.run({
+    await db.insertOrder({
       code, location_slug: loc.slug, customer_name: name, phone: phone || null, lang,
       items_json: JSON.stringify(lines), subtotal_cents: subtotal, tax_cents: tax, total_cents: total,
       payment_method: payment, status: 'awaiting_payment',
@@ -226,50 +216,51 @@ function createApp(config = {}) {
         client_reference_id: code,
         success_url: `${orderUrl}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${orderUrl}?cancelled=1`,
-      }).then(session => {
-        q.setStripe.run(session.id, nowIso(), code);
+      }).then(async session => {
+        await db.setStripe(session.id, nowIso(), code);
         res.status(201).json({ code, orderUrl, checkoutUrl: session.url });
-      }).catch(() => {
-        q.setStatus.run('cancelled', nowIso(), code);
+      }).catch(async () => {
+        await db.setStatus('cancelled', nowIso(), code);
         res.status(502).json({ error: 'Card checkout is unavailable right now. Try pay at counter.' });
       });
     }
 
     res.status(201).json({ code, orderUrl, checkoutUrl: null });
-  });
+  }));
 
-  app.get('/api/orders/:code', (req, res) => {
-    const o = q.order.get(String(req.params.code).toUpperCase());
+  app.get('/api/orders/:code', wrap(async (req, res) => {
+    const o = await db.order(String(req.params.code).toUpperCase());
     if (!o) return res.status(404).json({ error: 'Order not found.' });
     res.json(publicOrder(o));
-  });
+  }));
 
   // After Stripe redirects back, confirm the session server-side (works even without webhooks).
-  app.post('/api/orders/:code/confirm', (req, res) => {
+  app.post('/api/orders/:code/confirm', wrap(async (req, res) => {
     const code = String(req.params.code).toUpperCase();
-    const o = q.order.get(code);
+    const o = await db.order(code);
     if (!o) return res.status(404).json({ error: 'Order not found.' });
     if (o.status !== 'awaiting_payment') return res.json(publicOrder(o));
     const sessionId = cleanText(req.body && req.body.sessionId, 200);
 
     if (cfg.demoPayments && sessionId === 'demo') {
-      markPaid(code, 'demo');
-      return res.json(publicOrder(q.order.get(code)));
+      await markPaid(code, 'demo');
+      return res.json(publicOrder(await db.order(code)));
     }
     if (!stripe || !sessionId || !o.stripe_session || !safeEqual(sessionId, o.stripe_session)) {
       return res.status(400).json({ error: 'Payment could not be confirmed.' });
     }
-    stripe.checkout.sessions.retrieve(sessionId).then(session => {
-      if (session.payment_status === 'paid' && session.metadata && session.metadata.order_code === code) {
-        markPaid(code, session.id);
-      }
-      res.json(publicOrder(q.order.get(code)));
-    }).catch(() => res.status(502).json({ error: 'Could not reach the payment provider.' }));
-  });
+    let session;
+    try { session = await stripe.checkout.sessions.retrieve(sessionId); }
+    catch { return res.status(502).json({ error: 'Could not reach the payment provider.' }); }
+    if (session.payment_status === 'paid' && session.metadata && session.metadata.order_code === code) {
+      await markPaid(code, session.id);
+    }
+    res.json(publicOrder(await db.order(code)));
+  }));
 
-  app.get('/api/orders/:code/qr.svg', (req, res) => {
+  app.get('/api/orders/:code/qr.svg', wrap(async (req, res) => {
     const code = String(req.params.code).toUpperCase();
-    const o = q.order.get(code);
+    const o = await db.order(code);
     if (!o) return res.status(404).type('text/plain').send('Order not found');
     const url = `${originOf(req)}/staff?code=${code}`;
     QRCode.toString(url, { type: 'svg', margin: 1, width: 320, errorCorrectionLevel: 'M' }, (err, svg) => {
@@ -277,18 +268,18 @@ function createApp(config = {}) {
       res.setHeader('Cache-Control', 'no-store');
       res.type('image/svg+xml').send(svg);
     });
-  });
+  }));
 
   // Printable QR for a cooler/counter: scanning opens the menu for that spot.
-  app.get('/api/locations/:slug/qr.svg', (req, res) => {
-    const loc = q.location.get(cleanText(req.params.slug, 40));
+  app.get('/api/locations/:slug/qr.svg', wrap(async (req, res) => {
+    const loc = await db.location(cleanText(req.params.slug, 40));
     if (!loc) return res.status(404).type('text/plain').send('Location not found');
     const url = `${originOf(req)}/?loc=${encodeURIComponent(loc.slug)}`;
     QRCode.toString(url, { type: 'svg', margin: 1, width: 480, errorCorrectionLevel: 'H' }, (err, svg) => {
       if (err) return res.status(500).type('text/plain').send('QR failed');
       res.type('image/svg+xml').send(svg);
     });
-  });
+  }));
 
   // ---------- staff API ----------
 
@@ -301,45 +292,45 @@ function createApp(config = {}) {
     return null;
   }
 
-  function requireStaff(req, res, next) {
+  const requireStaff = wrap(async (req, res, next) => {
     const token = readCookie(req, 'gb_staff');
-    if (!token || !q.session.get(token, nowIso())) return res.status(401).json({ error: 'Staff sign-in required.' });
+    if (!token || !(await db.session(token, nowIso()))) return res.status(401).json({ error: 'Staff sign-in required.' });
     next();
-  }
+  });
 
-  app.post('/api/staff/login', (req, res) => {
+  app.post('/api/staff/login', wrap(async (req, res) => {
     if (limited(`login:${req.ip}`, 10, 15 * 60 * 1000)) return res.status(429).json({ error: 'Too many attempts. Wait 15 minutes.' });
     if (!cfg.staffPin) return res.status(503).json({ error: 'Staff PIN is not configured on the server (STAFF_PIN).' });
     const pin = cleanText(req.body && req.body.pin, 64);
     if (!pin || !safeEqual(pin, cfg.staffPin)) return res.status(401).json({ error: 'Wrong PIN.' });
-    q.purgeSessions.run(nowIso());
+    await db.purgeSessions(nowIso());
     const token = crypto.randomBytes(32).toString('base64url');
     const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
-    q.insertSession.run(token, expires.toISOString());
+    await db.insertSession(token, expires.toISOString());
     const secure = req.secure ? '; Secure' : '';
     res.setHeader('Set-Cookie', `gb_staff=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=43200${secure}`);
     res.json({ ok: true });
-  });
+  }));
 
-  app.post('/api/staff/logout', (req, res) => {
+  app.post('/api/staff/logout', wrap(async (req, res) => {
     const token = readCookie(req, 'gb_staff');
-    if (token) q.deleteSession.run(token);
+    if (token) await db.deleteSession(token);
     res.setHeader('Set-Cookie', 'gb_staff=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
     res.json({ ok: true });
-  });
+  }));
 
   app.get('/api/staff/me', requireStaff, (req, res) => res.json({ ok: true }));
 
-  app.get('/api/staff/orders', requireStaff, (req, res) => {
+  app.get('/api/staff/orders', requireStaff, wrap(async (req, res) => {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    res.json({ orders: q.recent.all(since).map(publicOrder) });
-  });
+    res.json({ orders: (await db.recent(since)).map(publicOrder) });
+  }));
 
-  app.get('/api/staff/orders/:code', requireStaff, (req, res) => {
-    const o = q.order.get(String(req.params.code).toUpperCase());
+  app.get('/api/staff/orders/:code', requireStaff, wrap(async (req, res) => {
+    const o = await db.order(String(req.params.code).toUpperCase());
     if (!o) return res.status(404).json({ error: 'Order not found.' });
     res.json({ ...publicOrder(o), phone: o.phone });
-  });
+  }));
 
   const ALLOWED = {
     awaiting_payment: ['paid', 'cancelled'],
@@ -349,16 +340,16 @@ function createApp(config = {}) {
     cancelled: [],
   };
 
-  app.post('/api/staff/orders/:code/status', requireStaff, (req, res) => {
+  app.post('/api/staff/orders/:code/status', requireStaff, wrap(async (req, res) => {
     const code = String(req.params.code).toUpperCase();
-    const o = q.order.get(code);
+    const o = await db.order(code);
     if (!o) return res.status(404).json({ error: 'Order not found.' });
     const next = cleanText(req.body && req.body.status, 20);
     if (!ORDER_STATUSES.includes(next)) return res.status(400).json({ error: 'Unknown status.' });
     if (!ALLOWED[o.status].includes(next)) return res.status(409).json({ error: `Cannot go from ${o.status} to ${next}.` });
-    q.setStatus.run(next, nowIso(), code);
-    res.json(publicOrder(q.order.get(code)));
-  });
+    await db.setStatus(next, nowIso(), code);
+    res.json(publicOrder(await db.order(code)));
+  }));
 
   // ---------- pages ----------
 
@@ -372,6 +363,7 @@ function createApp(config = {}) {
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     if (err && err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Bad JSON.' });
+    console.error('[gym-bruhs]', err && err.stack || err);
     res.status(500).json({ error: 'Server error.' });
   });
 
