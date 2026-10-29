@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f1a">
+<title>Your order — GYM BRUHS</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="logo">💪</span><span><b>GYM BRUHS</b><small data-i18n="tagline">Healthy Stuff</small></span></a>
+  <div class="actions"><button class="pill" id="langBtn" type="button">ES</button></div>
+</header>
+<main class="wrap">
+  <div class="ticket" id="ticket">
+    <div class="hint" id="forLine" style="color:#4a556e"></div>
+    <div class="code" id="code">······</div>
+    <div id="qr"></div>
+    <div class="steps" id="steps"><span></span><span></span><span></span></div>
+    <div class="status" id="status"></div>
+    <p id="msg" style="margin:6px 0 0;color:#4a556e"></p>
+    <div id="items" style="text-align:left;margin-top:12px;font-size:14px"></div>
+    <div id="totals" style="text-align:right;font-weight:800;margin-top:8px"></div>
+    <div id="payBox" style="margin-top:14px"></div>
+    <div class="err" id="err"></div>
+  </div>
+  <p style="text-align:center;margin-top:18px"><a href="/" class="btn ghost" style="display:inline-block;text-decoration:none" data-i18n="newOrder">Start a new order</a></p>
+</main>
+<script src="/i18n.js"></script>
+<script src="/order.js"></script>
+</body>
+</html>

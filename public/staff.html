@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f1a">
+<title>Staff — GYM BRUHS</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="logo">💪</span><span><b>GYM BRUHS</b><small>Staff</small></span></a>
+  <div class="actions">
+    <a class="pill" href="/print" style="text-decoration:none">Cooler QR</a>
+    <button class="pill" id="logout" type="button" hidden>Sign out</button>
+  </div>
+</header>
+<main class="wrap">
+  <section id="login" class="card" style="max-width:420px;margin:30px auto">
+    <h2 style="margin:0 0 10px">Staff sign-in</h2>
+    <form id="loginForm" class="form">
+      <label>PIN<input type="password" id="pin" inputmode="numeric" autocomplete="current-password" required></label>
+      <div class="err" id="loginErr"></div>
+      <button class="btn block" type="submit">Sign in</button>
+    </form>
+  </section>
+
+  <section id="board" hidden>
+    <div class="card">
+      <h2 style="margin:0 0 6px">Look up an order</h2>
+      <p class="hint" style="margin:0">Type the code from the customer's screen, or scan their QR.</p>
+      <form class="scanbox" id="lookupForm">
+        <input type="text" id="codeInput" placeholder="AB12CD" maxlength="6" autocomplete="off" aria-label="Order code">
+        <button class="btn" type="submit">Find</button>
+        <button class="btn ghost" type="button" id="scanBtn">📷 Scan</button>
+      </form>
+      <div id="scanner" hidden><video id="video" playsinline muted></video><button class="btn ghost block" type="button" id="stopScan" style="margin-top:8px">Stop camera</button></div>
+      <div id="found"></div>
+      <div class="err" id="lookupErr"></div>
+    </div>
+
+    <h2 style="margin:18px 0 8px">Last 24 hours</h2>
+    <div class="cats" id="filters"></div>
+    <div class="staff-list" id="list"></div>
+  </section>
+</main>
+<script src="/i18n.js"></script>
+<script src="/staff.js"></script>
+</body>
+</html>
