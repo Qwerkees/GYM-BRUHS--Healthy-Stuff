@@ -76,7 +76,9 @@ function openSqlite(file) {
 
 function openPostgres(url, schema) {
   const { Pool } = require('pg');
-  const pool = new Pool({ connectionString: url, max: 5, ssl: /localhost|127\.0\.0\.1/.test(url) ? false : { rejectUnauthorized: false } });
+  const local = /@(localhost|127\.0\.0\.1)[:/]/.test(url);
+  // Hosted providers (Neon etc.) present publicly-trusted certs, so full verification is kept.
+  const pool = new Pool({ connectionString: url, max: 5, ssl: local ? false : (/sslmode=/.test(url) ? undefined : { rejectUnauthorized: true }) });
   if (!/^[a-z_][a-z0-9_]*$/.test(schema)) throw new Error('PG_SCHEMA must be a simple identifier');
   pool.on('connect', (client) => client.query(`SET search_path TO ${schema}, public`));
 
