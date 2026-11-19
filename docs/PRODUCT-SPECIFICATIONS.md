@@ -9,7 +9,7 @@ A gym-oriented healthy-snack ordering platform: members browse and customize sna
 - Member QR ordering; staff code scan/manual entry; paid, ready, picked-up workflow.
 - Server-side pricing; optional Stripe; local SQLite or hosted Postgres; staff PIN; PWA.
 - README describes API and browser tests; demo payments are local only.
-- Existing README describes a dark + lime visual direction. This conflicts with the owner's permanent light-only standard and must be corrected before release. No dark backgrounds or dark-mode toggle.
+- The earlier dark + lime visual direction has been replaced with a light-only lime/orange palette in `public/styles.css` (commit `992e148e7979a49a3a753572d01752cadc63ac8c`). The matching production deployment reached READY. Runtime behavior and every page/state still require manual acceptance testing.
 
 ## Functional requirements
 1. Browse products with ingredients, allergens, portion, price, and verified nutrition data.
