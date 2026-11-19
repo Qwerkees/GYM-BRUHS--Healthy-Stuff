@@ -30,8 +30,7 @@ Features:
 
 ## Design
 
-Dark + lime, big display headlines, stacked card sections (hero → menu → order tracking → share QR →
-install → staff). The standalone prototype it's based on lives in `design/reference.html`.
+Light-only interface with bright lime and orange accents, big display headlines, and stacked card sections (hero → menu → order tracking → share QR → install → staff). Black/dark backgrounds and dark-mode toggles are not used. The standalone prototype it's based on lives in `design/reference.html`.
 English is the default language; the ES toggle is remembered per device.
 
 ## Run it
