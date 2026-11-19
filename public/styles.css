@@ -1,25 +1,25 @@
 /* GYM BRUHS — Healthy Stuff
-   Design: dark + lime, display headlines, stacked card sections (see design/reference.html). */
+   Design: bright light surfaces with lime and orange accents; light-only interface. */
 @font-face {
   font-family: "Bebas Neue"; font-style: normal; font-weight: 400; font-display: swap;
   src: url("/fonts/bebas-neue.woff2") format("woff2"); /* OFL — self-hosted, keeps CSP strict */
 }
 :root {
-  --bg: #0e0f0c;
-  --panel: #171913;
-  --panel-2: #1f221a;
-  --line: #2b2f24;
-  --ink: #f2f3ee;
-  --muted: #a7ab9c;
-  --lime: #c6ff3d;
-  --lime-ink: #0e0f0c;
-  --orange: #ff7a1a;
-  --cyan: #2ee6ff;
-  --ok: #1fb87a;
-  --warn: #ffc857;
-  --danger: #ff6b6b;
+  --bg: #F7F9F1;
+  --panel: #FFFFFF;
+  --panel-2: #EEF7D9;
+  --line: #D7E3C1;
+  --ink: #20271B;
+  --muted: #5C6752;
+  --lime: #8CCF1F;
+  --lime-ink: #18210E;
+  --orange: #F47721;
+  --cyan: #12899A;
+  --ok: #16865A;
+  --warn: #946200;
+  --danger: #B42318;
   --radius: 18px;
-  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --shadow: 0 8px 24px rgba(32,39,27,.10);
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -40,7 +40,7 @@ input, select, button { font-size: 16px; }
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 14px 16px 10px;
-  background: rgba(14,15,12,.88); backdrop-filter: blur(10px);
+  background: rgba(247,249,241,.94); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
@@ -66,7 +66,7 @@ input, select, button { font-size: 16px; }
 .hero {
   position: relative; overflow: hidden;
   padding: 28px 22px; border-radius: 26px;
-  background: linear-gradient(160deg, #1c2114, #121410);
+  background: linear-gradient(160deg, #F1F8D8, #FFFFFF);
   border: 1px solid var(--line);
   margin-bottom: 16px;
 }
@@ -170,7 +170,7 @@ select { appearance: none; -webkit-appearance: none; background-image: linear-gr
 .cartbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
   padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(14,15,12,.92); backdrop-filter: blur(10px);
+  background: rgba(247,249,241,.96); backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
 }
 .cartbar .inner { max-width: 600px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
@@ -180,7 +180,7 @@ select { appearance: none; -webkit-appearance: none; background-image: linear-gr
 body.has-cart { padding-bottom: 90px; }
 
 .sheet {
-  position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.65);
+  position: fixed; inset: 0; z-index: 40; background: rgba(32,39,27,.24);
   display: none; align-items: flex-end; justify-content: center;
 }
 .sheet.open { display: flex; }
